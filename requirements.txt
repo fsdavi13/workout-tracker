@@ -4,3 +4,5 @@ openpyxl
 pytest
 matplotlib
 reportlab
+fastapi
+uvicorn

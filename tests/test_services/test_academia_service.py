@@ -7,15 +7,7 @@ from database.connection import inicializar_banco
 from services.academia_service import AcademiaService
 
 
-def limpar_banco():
-    if DATABASE_PATH.exists():
-        DATABASE_PATH.unlink()
-
-    inicializar_banco()
-
-
 def test_cadastrar_exercicio():
-    limpar_banco()
 
     service = AcademiaService()
 
@@ -30,7 +22,6 @@ def test_cadastrar_exercicio():
 
 
 def test_nao_cadastrar_exercicio_sem_nome():
-    limpar_banco()
 
     service = AcademiaService()
 
@@ -42,7 +33,6 @@ def test_nao_cadastrar_exercicio_sem_nome():
 
 
 def test_registrar_serie():
-    limpar_banco()
 
     service = AcademiaService()
 
@@ -65,7 +55,6 @@ def test_registrar_serie():
 
 
 def test_nao_registrar_serie_com_repeticoes_invalidas():
-    limpar_banco()
 
     service = AcademiaService()
 
@@ -84,7 +73,6 @@ def test_nao_registrar_serie_com_repeticoes_invalidas():
 
 
 def test_calcular_volume_total_exercicio():
-    limpar_banco()
 
     service = AcademiaService()
 
@@ -115,7 +103,6 @@ def test_calcular_volume_total_exercicio():
 
 
 def test_buscar_maior_carga():
-    limpar_banco()
 
     service = AcademiaService()
 
@@ -153,7 +140,6 @@ def test_buscar_maior_carga():
 
 
 def test_buscar_maior_volume_serie():
-    limpar_banco()
 
     service = AcademiaService()
 
@@ -186,7 +172,6 @@ def test_buscar_maior_volume_serie():
 
 
 def test_calcular_volume_por_data():
-    limpar_banco()
 
     service = AcademiaService()
 

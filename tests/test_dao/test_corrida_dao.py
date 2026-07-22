@@ -1,64 +1,38 @@
 from datetime import date
 
-from database.connection import inicializar_banco, DATABASE_PATH
 from dao.corrida_dao import CorridaDAO
 from models.corrida import Corrida
 
 
-
-def limpar_banco():
-
-    if DATABASE_PATH.exists():
-        DATABASE_PATH.unlink()
-
-
-
 def test_criar_corrida():
-
-    limpar_banco()
-
-    inicializar_banco()
-
-
-    dao = CorridaDAO()
-
+    corrida_dao = CorridaDAO()
 
     corrida = Corrida(
-        date.today(),
-        5,
-        408,
-        "Corrida leve"
+        data=date.today(),
+        distancia_km=5,
+        pace="06:00"
     )
 
+    corrida_criada = corrida_dao.criar(corrida)
 
-    resultado = dao.criar(corrida)
-
-
-    assert resultado.id is not None
-
+    assert corrida_criada.id is not None
+    assert corrida_criada.distancia_km == 5
+    assert corrida_criada.pace == "06:00"
 
 
 def test_buscar_corridas():
-
-    limpar_banco()
-
-    inicializar_banco()
-
-
-    dao = CorridaDAO()
-
+    corrida_dao = CorridaDAO()
 
     corrida = Corrida(
-        date.today(),
-        5,
-        408
+        data=date.today(),
+        distancia_km=3,
+        pace="07:00"
     )
 
+    corrida_dao.criar(corrida)
 
-    dao.criar(corrida)
+    corridas = corrida_dao.buscar_todas()
 
-
-    corridas = dao.buscar_todas()
-
-
-    assert len(corridas) > 0
+    assert len(corridas) == 1
+    assert corridas[0].distancia_km == 3
+    assert corridas[0].pace == "07:00"

@@ -1,88 +1,61 @@
 from datetime import date
 
-from database.connection import inicializar_banco, DATABASE_PATH
 from dao.exercicio_dao import ExercicioDAO
 from dao.serie_dao import SerieDAO
 from models.exercicio import Exercicio
 from models.serie import Serie
 
 
-
-def limpar_banco():
-
-    if DATABASE_PATH.exists():
-        DATABASE_PATH.unlink()
-
-
-
 def test_criar_serie():
-
-    limpar_banco()
-
-    inicializar_banco()
-
-
     exercicio_dao = ExercicioDAO()
     serie_dao = SerieDAO()
 
-
     exercicio = Exercicio(
-        "Supino Reto",
-        "Peito"
+        nome="Supino Reto",
+        grupo_muscular="Peito"
     )
 
-
-    exercicio_dao.criar(exercicio)
-
+    exercicio = exercicio_dao.criar(exercicio)
 
     serie = Serie(
-        exercicio.id,
-        date.today(),
-        20,
-        10,
-        "Boa execução"
+        exercicio_id=exercicio.id,
+        data=date.today(),
+        peso=30,
+        repeticoes=10,
+        observacoes="Boa execução"
     )
 
+    serie_criada = serie_dao.criar(serie)
 
-    resultado = serie_dao.criar(serie)
-
-
-    assert resultado.id is not None
-
-
-
-def test_buscar_series():
-
-    limpar_banco()
-
-    inicializar_banco()
+    assert serie_criada.id is not None
+    assert serie_criada.exercicio_id == exercicio.id
+    assert serie_criada.peso == 30
+    assert serie_criada.repeticoes == 10
 
 
+def test_buscar_series_por_exercicio():
     exercicio_dao = ExercicioDAO()
     serie_dao = SerieDAO()
 
-
     exercicio = Exercicio(
-        "Supino Reto",
-        "Peito"
+        nome="Agachamento Livre",
+        grupo_muscular="Pernas"
     )
 
-
-    exercicio_dao.criar(exercicio)
-
+    exercicio = exercicio_dao.criar(exercicio)
 
     serie = Serie(
-        exercicio.id,
-        date.today(),
-        20,
-        10
+        exercicio_id=exercicio.id,
+        data=date.today(),
+        peso=80,
+        repeticoes=8
     )
-
 
     serie_dao.criar(serie)
 
+    series = serie_dao.buscar_por_exercicio(exercicio.id)
 
-    series = serie_dao.buscar_todas()
-
-
-    assert len(series) > 0
+    assert len(series) == 1
+    assert series[0].exercicio_id == exercicio.id
+    assert series[0].peso == 80
+    assert series[0].repeticoes == 8

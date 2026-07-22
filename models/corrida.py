@@ -1,38 +1,52 @@
-from datetime import date
-
-
 class Corrida:
 
-    def __init__(self, data, distancia_km, pace_segundos, observacoes=None, id=None):
+    def __init__(
+        self,
+        data,
+        distancia_km,
+        pace=None,
+        pace_segundos=None,
+        observacoes=None,
+        id=None
+    ):
         self.id = id
         self.data = data
         self.distancia_km = distancia_km
-        self.pace_segundos = pace_segundos
         self.observacoes = observacoes
 
-    def calcular_tempo_total(self):
-        return self.distancia_km * self.pace_segundos
+        if isinstance(pace, str):
+            self.pace = pace
+            self.pace_segundos = self.converter_pace_para_segundos(pace)
 
-    def obter_pace_formatado(self):
-        minutos = self.pace_segundos // 60
-        segundos = self.pace_segundos % 60
+        elif isinstance(pace, int):
+            self.pace_segundos = pace
+            self.pace = self.converter_segundos_para_pace(pace)
 
-        return f"{minutos}:{segundos:02d}/km"
+        else:
+            self.pace_segundos = pace_segundos
+            self.pace = self.converter_segundos_para_pace(pace_segundos)
 
-    def obter_tempo_formatado(self):
-        tempo_total = self.calcular_tempo_total()
-        horas = int(tempo_total // 3600)
-        minutos = int(tempo_total // 60)
-        segundos = int(tempo_total % 60)
+    def converter_pace_para_segundos(self, pace):
+        partes = pace.split(":")
 
-        if horas > 0:
-            return f"{horas}:{minutos:02d}:{segundos:02d}"
+        minutos = int(partes[0])
+        segundos = int(partes[1])
 
-        return f"{minutos}:{segundos:02d}"
+        return minutos * 60 + segundos
 
-    def __str__(self):
-        return (
-            f"{self.data.strftime('%d/%m/%Y')} - "
-            f"{self.distancia_km}km - "
-            f"{self.obter_pace_formatado()}"
+    def converter_segundos_para_pace(self, pace_segundos):
+        if pace_segundos is None:
+            return None
+
+        minutos = pace_segundos // 60
+        segundos = pace_segundos % 60
+
+        return f"{minutos:02d}:{segundos:02d}"
+
+    def calcular_tempo_segundos(self):
+        if self.pace_segundos is None:
+            return None
+
+        return int(
+            self.pace_segundos * self.distancia_km
         )

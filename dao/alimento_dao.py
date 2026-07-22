@@ -136,18 +136,18 @@ class AlimentoDAO:
 
 
         for linha in resultados:
-
             alimento = Alimento(
-                linha["nome"],
-                linha["calorias_por_100g"],
-                linha["proteinas_g"],
-                linha["carboidratos_g"],
-                linha["gorduras_g"],
-                linha["categoria"],
-                linha["id"]
-            )
+            nome=linha["nome"],
+            calorias_por_100g=linha["calorias_por_100g"],
+            proteinas_g=linha["proteinas_g"],
+            carboidratos_g=linha["carboidratos_g"],
+            gorduras_g=linha["gorduras_g"],
+            categoria=linha["categoria"],
+            fonte=linha["fonte"],
+            id=linha["id"]
+        )
 
-            alimentos.append(alimento)
+        alimentos.append(alimento)
 
 
         return alimentos

@@ -9,6 +9,11 @@ DATABASE_DIR = BASE_DIR / "database"
 DATABASE_PATH = DATABASE_DIR / "workout_tracker.db"
 SCHEMA_PATH = DATABASE_DIR / "schema.sql"
 
+TEST_DATABASE_PATH = (
+    BASE_DIR
+    / "database"
+    / "test_workout_tracker.db"
+)
 
 # Importadores
 SEEDS_DIR = DATABASE_DIR / "seeds"

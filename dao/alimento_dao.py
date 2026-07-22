@@ -4,25 +4,21 @@ from models.alimento import Alimento
 
 class AlimentoDAO:
 
-
     def criar(self, alimento):
-
         comando = """
-            INSERT INTO alimentos
-            (
+            INSERT INTO alimentos (
                 nome,
                 calorias_por_100g,
                 proteinas_g,
                 carboidratos_g,
                 gorduras_g,
-                categoria
+                categoria,
+                fonte
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """
 
-
         with conexao() as con:
-
             cursor = con.execute(
                 comando,
                 (
@@ -31,142 +27,82 @@ class AlimentoDAO:
                     alimento.proteinas_g,
                     alimento.carboidratos_g,
                     alimento.gorduras_g,
-                    alimento.categoria
+                    alimento.categoria,
+                    alimento.fonte
                 )
             )
 
             alimento.id = cursor.lastrowid
 
-
         return alimento
 
-
-
     def buscar_por_id(self, id):
-
         comando = """
             SELECT *
             FROM alimentos
             WHERE id = ?
         """
 
-
         with conexao() as con:
-
             resultado = con.execute(
                 comando,
                 (id,)
             ).fetchone()
 
+        if resultado is None:
+            return None
 
-        if resultado:
-
-            return Alimento(
-                resultado["nome"],
-                resultado["calorias_por_100g"],
-                resultado["proteinas_g"],
-                resultado["carboidratos_g"],
-                resultado["gorduras_g"],
-                resultado["categoria"],
-                resultado["id"]
-            )
-
-
-        return None
-
-
+        return self._converter_linha_para_alimento(resultado)
 
     def buscar_por_nome(self, nome):
-
         comando = """
             SELECT *
             FROM alimentos
             WHERE nome LIKE ?
+            ORDER BY nome
         """
 
-
         with conexao() as con:
-
             resultados = con.execute(
                 comando,
                 (f"%{nome}%",)
             ).fetchall()
 
-
-        alimentos = []
-
-
-        for linha in resultados:
-
-            alimento = Alimento(
-                linha["nome"],
-                linha["calorias_por_100g"],
-                linha["proteinas_g"],
-                linha["carboidratos_g"],
-                linha["gorduras_g"],
-                linha["categoria"],
-                linha["id"]
-            )
-
-            alimentos.append(alimento)
-
-
-        return alimentos
-
-
+        return [
+            self._converter_linha_para_alimento(linha)
+            for linha in resultados
+        ]
 
     def buscar_todos(self):
-
         comando = """
             SELECT *
             FROM alimentos
             ORDER BY nome
         """
 
-
-        alimentos = []
-
-
         with conexao() as con:
+            resultados = con.execute(comando).fetchall()
 
-            resultados = con.execute(
-                comando
-            ).fetchall()
-
-
-
-        for linha in resultados:
-            alimento = Alimento(
-            nome=linha["nome"],
-            calorias_por_100g=linha["calorias_por_100g"],
-            proteinas_g=linha["proteinas_g"],
-            carboidratos_g=linha["carboidratos_g"],
-            gorduras_g=linha["gorduras_g"],
-            categoria=linha["categoria"],
-            fonte=linha["fonte"],
-            id=linha["id"]
-        )
-
-        alimentos.append(alimento)
-
-
-        return alimentos
-
-
+        return [
+            self._converter_linha_para_alimento(linha)
+            for linha in resultados
+        ]
 
     def atualizar(self, alimento):
-
-        comando = """UPDATE alimentos SET nome = ?,
+        comando = """
+            UPDATE alimentos
+            SET
+                nome = ?,
                 calorias_por_100g = ?,
                 proteinas_g = ?,
                 carboidratos_g = ?,
                 gorduras_g = ?,
-                categoria = ?
+                categoria = ?,
+                fonte = ?
             WHERE id = ?
         """
 
         with conexao() as con:
-
             con.execute(
                 comando,
                 (
@@ -176,18 +112,28 @@ class AlimentoDAO:
                     alimento.carboidratos_g,
                     alimento.gorduras_g,
                     alimento.categoria,
+                    alimento.fonte,
                     alimento.id
                 )
             )
 
-
-
     def deletar(self, id):
-        comando = """DELETE FROM alimentos WHERE id = ?"""
+        comando = """
+            DELETE FROM alimentos
+            WHERE id = ?
+        """
 
         with conexao() as con:
+            con.execute(comando, (id,))
 
-            con.execute(
-                comando,
-                (id,)
-            )
+    def _converter_linha_para_alimento(self, linha):
+        return Alimento(
+            nome=linha["nome"],
+            calorias_por_100g=linha["calorias_por_100g"],
+            proteinas_g=linha["proteinas_g"],
+            carboidratos_g=linha["carboidratos_g"],
+            gorduras_g=linha["gorduras_g"],
+            categoria=linha["categoria"],
+            fonte=linha["fonte"],
+            id=linha["id"]
+        )

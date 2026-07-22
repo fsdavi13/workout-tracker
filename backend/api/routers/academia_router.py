@@ -1,5 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from backend.api.dependencies import obter_academia_service
 from backend.api.schemas.academia_schema import (
     ExercicioEntrada,
     ExercicioResposta,
@@ -13,7 +16,10 @@ router = APIRouter(
     tags=["Academia"],
 )
 
-service = AcademiaService()
+AcademiaServiceDependencia = Annotated[
+    AcademiaService,
+    Depends(obter_academia_service),
+]
 
 
 def converter_exercicio(exercicio) -> ExercicioResposta:
@@ -41,7 +47,10 @@ def converter_serie(serie) -> SerieResposta:
     response_model=ExercicioResposta,
     status_code=status.HTTP_201_CREATED,
 )
-def cadastrar_exercicio(dados: ExercicioEntrada):
+def cadastrar_exercicio(
+    dados: ExercicioEntrada,
+    service: AcademiaServiceDependencia,
+):
     try:
         exercicio = service.cadastrar_exercicio(
             nome=dados.nome,
@@ -59,16 +68,25 @@ def cadastrar_exercicio(dados: ExercicioEntrada):
     "/exercicios",
     response_model=list[ExercicioResposta],
 )
-def listar_exercicios():
+def listar_exercicios(
+    service: AcademiaServiceDependencia,
+):
     exercicios = service.listar_exercicios()
-    return [converter_exercicio(exercicio) for exercicio in exercicios]
+
+    return [
+        converter_exercicio(exercicio)
+        for exercicio in exercicios
+    ]
 
 
 @router.get(
     "/exercicios/{exercicio_id}",
     response_model=ExercicioResposta,
 )
-def buscar_exercicio(exercicio_id: int):
+def buscar_exercicio(
+    exercicio_id: int,
+    service: AcademiaServiceDependencia,
+):
     try:
         exercicio = service.buscar_exercicio_por_id(exercicio_id)
         return converter_exercicio(exercicio)
@@ -86,6 +104,7 @@ def buscar_exercicio(exercicio_id: int):
 def atualizar_exercicio(
     exercicio_id: int,
     dados: ExercicioEntrada,
+    service: AcademiaServiceDependencia,
 ):
     try:
         exercicio = service.atualizar_exercicio(
@@ -96,6 +115,7 @@ def atualizar_exercicio(
         return converter_exercicio(exercicio)
     except ValueError as erro:
         mensagem = str(erro)
+
         codigo = (
             status.HTTP_404_NOT_FOUND
             if mensagem == "Exercício não encontrado."
@@ -112,7 +132,10 @@ def atualizar_exercicio(
     "/exercicios/{exercicio_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def excluir_exercicio(exercicio_id: int):
+def excluir_exercicio(
+    exercicio_id: int,
+    service: AcademiaServiceDependencia,
+):
     try:
         service.excluir_exercicio(exercicio_id)
     except ValueError as erro:
@@ -127,7 +150,10 @@ def excluir_exercicio(exercicio_id: int):
     response_model=SerieResposta,
     status_code=status.HTTP_201_CREATED,
 )
-def registrar_serie(dados: SerieEntrada):
+def registrar_serie(
+    dados: SerieEntrada,
+    service: AcademiaServiceDependencia,
+):
     try:
         serie = service.registrar_serie(
             exercicio_id=dados.exercicio_id,
@@ -139,6 +165,7 @@ def registrar_serie(dados: SerieEntrada):
         return converter_serie(serie)
     except ValueError as erro:
         mensagem = str(erro)
+
         codigo = (
             status.HTTP_404_NOT_FOUND
             if mensagem == "Exercício não encontrado."
@@ -155,19 +182,32 @@ def registrar_serie(dados: SerieEntrada):
     "/series",
     response_model=list[SerieResposta],
 )
-def listar_series():
+def listar_series(
+    service: AcademiaServiceDependencia,
+):
     series = service.listar_series()
-    return [converter_serie(serie) for serie in series]
+
+    return [
+        converter_serie(serie)
+        for serie in series
+    ]
 
 
 @router.get(
     "/exercicios/{exercicio_id}/series",
     response_model=list[SerieResposta],
 )
-def listar_series_por_exercicio(exercicio_id: int):
+def listar_series_por_exercicio(
+    exercicio_id: int,
+    service: AcademiaServiceDependencia,
+):
     try:
         series = service.buscar_series_por_exercicio(exercicio_id)
-        return [converter_serie(serie) for serie in series]
+
+        return [
+            converter_serie(serie)
+            for serie in series
+        ]
     except ValueError as erro:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -179,7 +219,10 @@ def listar_series_por_exercicio(exercicio_id: int):
     "/series/{serie_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def excluir_serie(serie_id: int):
+def excluir_serie(
+    serie_id: int,
+    service: AcademiaServiceDependencia,
+):
     try:
         service.excluir_serie(serie_id)
     except ValueError as erro:

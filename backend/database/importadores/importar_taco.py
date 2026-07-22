@@ -1,6 +1,7 @@
 import pandas as pd
 
 from backend.database.connection import conexao, inicializar_banco
+from backend.database import config
 
 
 CAMINHO_TACO = "database/seeds/taco.xlsx"
@@ -31,8 +32,8 @@ def converter_numero(valor):
 def importar_taco():
 
     tabela = pd.read_excel(
-        CAMINHO_TACO,
-        header=None
+        config.TACO_PATH,
+        header=None,
     )
 
 

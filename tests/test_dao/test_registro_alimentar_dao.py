@@ -1,9 +1,9 @@
 from datetime import date
 
-from dao.alimento_dao import AlimentoDAO
-from dao.registro_alimentar_dao import RegistroAlimentarDAO
-from models.alimento import Alimento
-from models.registro_alimentar import RegistroAlimentar
+from backend.dao.alimento_dao import AlimentoDAO
+from backend.dao.registro_alimentar_dao import RegistroAlimentarDAO
+from backend.models.alimento import Alimento
+from backend.models.registro_alimentar import RegistroAlimentar
 
 
 def criar_alimento_teste(nome="Frango"):

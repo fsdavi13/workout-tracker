@@ -1,7 +1,7 @@
 from datetime import date
 
-from database.connection import conexao
-from models.registro_alimentar import RegistroAlimentar
+from backend.database.connection import conexao
+from backend.models.registro_alimentar import RegistroAlimentar
 
 
 class RegistroAlimentarDAO:

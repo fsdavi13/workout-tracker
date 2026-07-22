@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from services.corrida_service import CorridaService
+from backend.services.corrida_service import CorridaService
 
 
 def test_registrar_corrida():

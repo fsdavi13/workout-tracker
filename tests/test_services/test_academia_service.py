@@ -2,9 +2,9 @@ from datetime import date
 
 import pytest
 
-from config import DATABASE_PATH
-from database.connection import inicializar_banco
-from services.academia_service import AcademiaService
+from backend.database.config import DATABASE_PATH
+from backend.database.connection import inicializar_banco
+from backend.services.academia_service import AcademiaService
 
 
 def test_cadastrar_exercicio():

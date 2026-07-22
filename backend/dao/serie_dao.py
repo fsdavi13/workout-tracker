@@ -1,7 +1,7 @@
 from datetime import date
 
-from database.connection import conexao
-from models.serie import Serie
+from backend.database.connection import conexao
+from backend.models.serie import Serie
 
 
 class SerieDAO:

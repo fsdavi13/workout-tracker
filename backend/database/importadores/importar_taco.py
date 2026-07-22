@@ -1,6 +1,6 @@
 import pandas as pd
 
-from database.connection import conexao, inicializar_banco
+from backend.database.connection import conexao, inicializar_banco
 
 
 CAMINHO_TACO = "database/seeds/taco.xlsx"

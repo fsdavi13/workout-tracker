@@ -1,7 +1,7 @@
 from datetime import date
 
-from dao.corrida_dao import CorridaDAO
-from models.corrida import Corrida
+from backend.dao.corrida_dao import CorridaDAO
+from backend.models.corrida import Corrida
 
 
 def test_criar_corrida():

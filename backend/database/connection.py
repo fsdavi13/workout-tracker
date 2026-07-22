@@ -1,7 +1,7 @@
 import sqlite3
 from contextlib import contextmanager
 
-import config
+from backend.database import config
 
 
 # Mantém compatibilidade com testes antigos.

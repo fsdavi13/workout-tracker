@@ -1,7 +1,7 @@
 import pytest
 
-import config
-from database.connection import inicializar_banco
+from backend.database import config
+from backend.database.connection import inicializar_banco
 
 
 @pytest.fixture(autouse=True)

@@ -1,5 +1,5 @@
-from database.connection import conexao
-from models.porcao import Porcao
+from backend.database.connection import conexao
+from backend.models.porcao import Porcao
 
 
 class PorcaoDAO:

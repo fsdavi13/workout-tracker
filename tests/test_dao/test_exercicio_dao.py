@@ -1,5 +1,5 @@
-from dao.exercicio_dao import ExercicioDAO
-from models.exercicio import Exercicio
+from backend.dao.exercicio_dao import ExercicioDAO
+from backend.models.exercicio import Exercicio
 
 
 def test_criar_exercicio():

@@ -1,7 +1,7 @@
-from dao.exercicio_dao import ExercicioDAO
-from dao.serie_dao import SerieDAO
-from models.exercicio import Exercicio
-from models.serie import Serie
+from backend.dao.exercicio_dao import ExercicioDAO
+from backend.dao.serie_dao import SerieDAO
+from backend.models.exercicio import Exercicio
+from backend.models.serie import Serie
 
 
 class AcademiaService:

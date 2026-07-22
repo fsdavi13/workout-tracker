@@ -1,7 +1,7 @@
 from datetime import date
 
-from database.connection import conexao
-from models.corrida import Corrida
+from backend.database.connection import conexao
+from backend.models.corrida import Corrida
 
 
 class CorridaDAO:

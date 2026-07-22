@@ -1,5 +1,5 @@
-from database.connection import conexao
-from models.alimento import Alimento
+from backend.database.connection import conexao
+from backend.models.alimento import Alimento
 
 
 class AlimentoDAO:

@@ -1,5 +1,5 @@
-from models.exercicio import Exercicio
-from database.connection import conexao
+from backend.models.exercicio import Exercicio
+from backend.database.connection import conexao
 
 
 class ExercicioDAO:

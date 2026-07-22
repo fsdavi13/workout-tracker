@@ -1,5 +1,5 @@
-from dao.alimento_dao import AlimentoDAO
-from models.alimento import Alimento
+from backend.dao.alimento_dao import AlimentoDAO
+from backend.models.alimento import Alimento
 
 
 def criar_alimento_teste(nome="Banana"):

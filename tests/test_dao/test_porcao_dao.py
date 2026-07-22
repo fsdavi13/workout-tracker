@@ -1,8 +1,8 @@
-from database.connection import inicializar_banco
-from dao.alimento_dao import AlimentoDAO
-from dao.porcao_dao import PorcaoDAO
-from models.alimento import Alimento
-from models.porcao import Porcao
+from backend.database.connection import inicializar_banco
+from backend.dao.alimento_dao import AlimentoDAO
+from backend.dao.porcao_dao import PorcaoDAO
+from backend.models.alimento import Alimento
+from backend.models.porcao import Porcao
 
 
 def test_criar_porcao():

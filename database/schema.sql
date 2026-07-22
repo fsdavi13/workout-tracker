@@ -52,3 +52,11 @@ CREATE TABLE IF NOT EXISTS medidas_caseiras (
         REFERENCES alimentos(id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS porcoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    alimento_id INTEGER NOT NULL,
+    descricao TEXT NOT NULL,
+    gramas REAL NOT NULL,
+    FOREIGN KEY (alimento_id) REFERENCES alimentos(id)
+);

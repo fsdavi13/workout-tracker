@@ -1,3 +1,5 @@
+import unicodedata
+
 from backend.dao.exercicio_dao import ExercicioDAO
 from backend.dao.serie_dao import SerieDAO
 from backend.models.exercicio import Exercicio
@@ -5,24 +7,65 @@ from backend.models.serie import Serie
 
 
 class AcademiaService:
-
     def __init__(self):
         self.exercicio_dao = ExercicioDAO()
         self.serie_dao = SerieDAO()
 
-    def cadastrar_exercicio(self, nome, grupo_muscular):
-        nome = nome.strip()
-        grupo_muscular = grupo_muscular.strip()
+    @staticmethod
+    def _normalizar_nome_exercicio(nome):
+        nome_sem_acentos = "".join(
+            caractere
+            for caractere in unicodedata.normalize("NFD", nome)
+            if unicodedata.category(caractere) != "Mn"
+        )
+
+        return " ".join(nome_sem_acentos.casefold().split())
+
+    def _validar_nome_exercicio_unico(
+        self,
+        nome,
+        exercicio_id_ignorado=None,
+    ):
+        nome_normalizado = self._normalizar_nome_exercicio(nome)
+
+        for exercicio in self.exercicio_dao.buscar_todos():
+            if exercicio.id == exercicio_id_ignorado:
+                continue
+
+            nome_existente = self._normalizar_nome_exercicio(
+                exercicio.nome
+            )
+
+            if nome_existente == nome_normalizado:
+                raise ValueError(
+                    "Já existe um exercício com esse nome."
+                )
+
+    def cadastrar_exercicio(
+        self,
+        nome,
+        grupo_muscular,
+    ):
+        nome = " ".join(nome.strip().split())
+        grupo_muscular = " ".join(
+            grupo_muscular.strip().split()
+        )
 
         if not nome:
-            raise ValueError("O nome do exercício é obrigatório.")
+            raise ValueError(
+                "O nome do exercício é obrigatório."
+            )
 
         if not grupo_muscular:
-            raise ValueError("O grupo muscular é obrigatório.")
+            raise ValueError(
+                "O grupo muscular é obrigatório."
+            )
+
+        self._validar_nome_exercicio_unico(nome)
 
         exercicio = Exercicio(
             nome=nome,
-            grupo_muscular=grupo_muscular
+            grupo_muscular=grupo_muscular,
         )
 
         return self.exercicio_dao.criar(exercicio)
@@ -42,18 +85,31 @@ class AcademiaService:
         self,
         exercicio_id,
         nome,
-        grupo_muscular
+        grupo_muscular,
     ):
-        exercicio = self.buscar_exercicio_por_id(exercicio_id)
+        exercicio = self.buscar_exercicio_por_id(
+            exercicio_id
+        )
 
-        nome = nome.strip()
-        grupo_muscular = grupo_muscular.strip()
+        nome = " ".join(nome.strip().split())
+        grupo_muscular = " ".join(
+            grupo_muscular.strip().split()
+        )
 
         if not nome:
-            raise ValueError("O nome do exercício é obrigatório.")
+            raise ValueError(
+                "O nome do exercício é obrigatório."
+            )
 
         if not grupo_muscular:
-            raise ValueError("O grupo muscular é obrigatório.")
+            raise ValueError(
+                "O grupo muscular é obrigatório."
+            )
+
+        self._validar_nome_exercicio_unico(
+            nome,
+            exercicio_id_ignorado=exercicio_id,
+        )
 
         exercicio.nome = nome
         exercicio.grupo_muscular = grupo_muscular

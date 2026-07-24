@@ -1,0 +1,144 @@
+.app-layout {
+  min-height: 100dvh;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(84, 84, 95, 0.18),
+      transparent 35%
+    ),
+    #111113;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+
+  display: flex;
+  align-items: center;
+
+  min-height: 72px;
+  padding:
+    calc(16px + env(safe-area-inset-top))
+    20px
+    16px;
+
+  background: rgba(17, 17, 19, 0.86);
+  border-bottom: 1px solid #29292e;
+  backdrop-filter: blur(18px);
+}
+
+.app-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-header__logo {
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.app-header__subtitle {
+  color: #92929c;
+  font-size: 0.76rem;
+}
+
+.app-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  padding:
+    24px
+    16px
+    calc(104px + env(safe-area-inset-bottom));
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page--centered {
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page__header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.7rem, 8vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.page__header p {
+  max-width: 600px;
+  margin: 0;
+  color: #a1a1aa;
+  line-height: 1.5;
+}
+
+.page__eyebrow {
+  color: #d4d4d8 !important;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 48px;
+  padding: 0 20px;
+
+  color: #111113;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 14px;
+
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 240px;
+    min-height: 88px;
+    padding: 24px 28px;
+
+    border-right: 1px solid #29292e;
+  }
+
+  .app-header__logo {
+    font-size: 1.6rem;
+  }
+
+  .app-content {
+    min-height: 100dvh;
+    margin-left: 240px;
+    padding: 48px;
+  }
+
+  .page__header h1 {
+    font-size: 2.5rem;
+  }
+}

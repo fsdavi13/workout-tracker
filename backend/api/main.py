@@ -9,7 +9,7 @@ from backend.api.routers.dieta_router import router as dieta_router
 from backend.api.routers.dashboard_router import (
     router as dashboard_router,
 )
-
+from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,6 +22,17 @@ app = FastAPI(
     description="API para gerenciamento de treinos, corridas e alimentação.",
     version="1.0.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(academia_router)

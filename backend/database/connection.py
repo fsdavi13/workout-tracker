@@ -11,18 +11,15 @@ DATABASE_PATH = config.TEST_DATABASE_PATH
 @contextmanager
 def conexao():
     con = sqlite3.connect(config.DATABASE_PATH)
-
-    # Permite acessar resultados como linha["nome"].
     con.row_factory = sqlite3.Row
+    con.execute("PRAGMA foreign_keys = ON")
 
     try:
         yield con
         con.commit()
-
     except Exception:
         con.rollback()
         raise
-
     finally:
         con.close()
 

@@ -4,6 +4,27 @@ CREATE TABLE IF NOT EXISTS exercicios (
     grupo_muscular TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS divisoes_treino (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL UNIQUE,
+    descricao TEXT
+);
+
+CREATE TABLE IF NOT EXISTS divisao_exercicios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    divisao_id INTEGER NOT NULL,
+    exercicio_id INTEGER NOT NULL,
+    ordem INTEGER NOT NULL,
+    FOREIGN KEY (divisao_id)
+        REFERENCES divisoes_treino (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (exercicio_id)
+        REFERENCES exercicios (id)
+        ON DELETE CASCADE,
+    UNIQUE (divisao_id, exercicio_id),
+    UNIQUE (divisao_id, ordem)
+);
+
 CREATE TABLE IF NOT EXISTS series (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     exercicio_id INTEGER NOT NULL,

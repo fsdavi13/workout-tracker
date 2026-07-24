@@ -4,12 +4,238 @@ from backend.dao.exercicio_dao import ExercicioDAO
 from backend.dao.serie_dao import SerieDAO
 from backend.models.exercicio import Exercicio
 from backend.models.serie import Serie
+from backend.dao.divisao_exercicio_dao import (
+    DivisaoExercicioDAO,
+)
+from backend.dao.divisao_treino_dao import (
+    DivisaoTreinoDAO,
+)
+from backend.models.divisao_exercicio import (
+    DivisaoExercicio,
+)
+from backend.models.divisao_treino import DivisaoTreino
 
 
 class AcademiaService:
     def __init__(self):
         self.exercicio_dao = ExercicioDAO()
         self.serie_dao = SerieDAO()
+        self.divisao_treino_dao = DivisaoTreinoDAO()
+        self.divisao_exercicio_dao = DivisaoExercicioDAO()
+
+    def cadastrar_divisao(
+        self,
+        nome,
+        descricao=None,
+    ):
+        nome = " ".join(nome.strip().split())
+
+        if not nome:
+            raise ValueError(
+                "O nome da divisão é obrigatório."
+            )
+
+        if descricao is not None:
+            descricao = " ".join(
+                descricao.strip().split()
+            )
+
+            if not descricao:
+                descricao = None
+
+        nome_normalizado = (
+            self._normalizar_nome_exercicio(nome)
+        )
+
+        for divisao in (
+            self.divisao_treino_dao.buscar_todas()
+        ):
+            if (
+                self._normalizar_nome_exercicio(
+                    divisao.nome
+                )
+                == nome_normalizado
+            ):
+                raise ValueError(
+                    "Já existe uma divisão com esse nome."
+                )
+
+        divisao = DivisaoTreino(
+            nome=nome,
+            descricao=descricao,
+        )
+
+        return self.divisao_treino_dao.criar(
+            divisao
+        )
+
+    def listar_divisoes(self):
+        return self.divisao_treino_dao.buscar_todas()
+
+    def buscar_divisao_por_id(self, divisao_id):
+        divisao = (
+            self.divisao_treino_dao.buscar_por_id(
+                divisao_id
+            )
+        )
+
+        if divisao is None:
+            raise ValueError(
+                "Divisão de treino não encontrada."
+            )
+
+        return divisao
+
+    def buscar_divisao_com_exercicios(
+        self,
+        divisao_id,
+    ):
+        divisao = self.buscar_divisao_por_id(
+            divisao_id
+        )
+
+        exercicios = (
+            self.divisao_exercicio_dao
+            .buscar_por_divisao(divisao_id)
+        )
+
+        return divisao, exercicios
+
+    def atualizar_divisao(
+        self,
+        divisao_id,
+        nome,
+        descricao=None,
+    ):
+        divisao = self.buscar_divisao_por_id(
+            divisao_id
+        )
+
+        nome = " ".join(nome.strip().split())
+
+        if not nome:
+            raise ValueError(
+                "O nome da divisão é obrigatório."
+            )
+
+        if descricao is not None:
+            descricao = " ".join(
+                descricao.strip().split()
+            )
+
+            if not descricao:
+                descricao = None
+
+        nome_normalizado = (
+            self._normalizar_nome_exercicio(nome)
+        )
+
+        for divisao_existente in (
+            self.divisao_treino_dao.buscar_todas()
+        ):
+            if divisao_existente.id == divisao_id:
+                continue
+
+            if (
+                self._normalizar_nome_exercicio(
+                    divisao_existente.nome
+                )
+                == nome_normalizado
+            ):
+                raise ValueError(
+                    "Já existe uma divisão com esse nome."
+                )
+
+        divisao.nome = nome
+        divisao.descricao = descricao
+
+        return self.divisao_treino_dao.atualizar(
+            divisao
+        )
+
+    def excluir_divisao(self, divisao_id):
+        self.buscar_divisao_por_id(divisao_id)
+        self.divisao_treino_dao.deletar(divisao_id)
+
+    def adicionar_exercicio_divisao(
+        self,
+        divisao_id,
+        exercicio_id,
+    ):
+        self.buscar_divisao_por_id(divisao_id)
+        exercicio = self.buscar_exercicio_por_id(
+            exercicio_id
+        )
+
+        associacao_existente = (
+            self.divisao_exercicio_dao
+            .buscar_por_divisao_e_exercicio(
+                divisao_id,
+                exercicio_id,
+            )
+        )
+
+        if associacao_existente is not None:
+            raise ValueError(
+                "O exercício já pertence a essa divisão."
+            )
+
+        ordem = (
+            self.divisao_exercicio_dao
+            .buscar_proxima_ordem(divisao_id)
+        )
+
+        associacao = DivisaoExercicio(
+            divisao_id=divisao_id,
+            exercicio_id=exercicio_id,
+            ordem=ordem,
+            exercicio=exercicio,
+        )
+
+        return self.divisao_exercicio_dao.criar(
+            associacao
+        )
+
+    def remover_exercicio_divisao(
+        self,
+        divisao_id,
+        exercicio_id,
+    ):
+        self.buscar_divisao_por_id(divisao_id)
+
+        associacao = (
+            self.divisao_exercicio_dao
+            .buscar_por_divisao_e_exercicio(
+                divisao_id,
+                exercicio_id,
+            )
+        )
+
+        if associacao is None:
+            raise ValueError(
+                "O exercício não pertence a essa divisão."
+            )
+
+        self.divisao_exercicio_dao\
+            .deletar_por_divisao_e_exercicio(
+                divisao_id,
+                exercicio_id,
+            )
+
+        associacoes_restantes = (
+            self.divisao_exercicio_dao
+            .buscar_por_divisao(divisao_id)
+        )
+
+        for indice, item in enumerate(
+            associacoes_restantes,
+            start=1,
+        ):
+            self.divisao_exercicio_dao\
+                .atualizar_ordem(
+                    item.id,
+                    indice,
+                )
 
     @staticmethod
     def _normalizar_nome_exercicio(nome):

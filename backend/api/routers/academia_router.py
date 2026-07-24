@@ -8,7 +8,13 @@ from backend.api.schemas.academia_schema import (
     ExercicioResposta,
     SerieEntrada,
     SerieResposta,
+    DivisaoDetalhadaResposta,
+    DivisaoEntrada,
+    DivisaoResposta,
+    ExercicioDivisaoEntrada,
+    ExercicioDivisaoResposta,
 )
+
 from backend.services.academia_service import AcademiaService
 
 router = APIRouter(
@@ -41,6 +47,217 @@ def converter_serie(serie) -> SerieResposta:
         volume=serie.calcular_volume(),
     )
 
+
+def converter_divisao(
+    divisao,
+) -> DivisaoResposta:
+    return DivisaoResposta(
+        id=divisao.id,
+        nome=divisao.nome,
+        descricao=divisao.descricao,
+    )
+
+
+def converter_exercicio_divisao(
+    associacao,
+) -> ExercicioDivisaoResposta:
+    return ExercicioDivisaoResposta(
+        id=associacao.id,
+        exercicio_id=associacao.exercicio_id,
+        nome=associacao.exercicio.nome,
+        grupo_muscular=(
+            associacao.exercicio.grupo_muscular
+        ),
+        ordem=associacao.ordem,
+    )
+
+
+@router.post(
+    "/divisoes",
+    response_model=DivisaoResposta,
+    status_code=status.HTTP_201_CREATED,
+)
+def cadastrar_divisao(
+    dados: DivisaoEntrada,
+    service: AcademiaServiceDependencia,
+):
+    try:
+        divisao = service.cadastrar_divisao(
+            nome=dados.nome,
+            descricao=dados.descricao,
+        )
+
+        return converter_divisao(divisao)
+    except ValueError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(erro),
+        ) from erro
+
+
+@router.get(
+    "/divisoes",
+    response_model=list[DivisaoResposta],
+)
+def listar_divisoes(
+    service: AcademiaServiceDependencia,
+):
+    return [
+        converter_divisao(divisao)
+        for divisao in service.listar_divisoes()
+    ]
+
+
+@router.get(
+    "/divisoes/{divisao_id}",
+    response_model=DivisaoDetalhadaResposta,
+)
+def buscar_divisao(
+    divisao_id: int,
+    service: AcademiaServiceDependencia,
+):
+    try:
+        divisao, exercicios = (
+            service.buscar_divisao_com_exercicios(
+                divisao_id
+            )
+        )
+
+        return DivisaoDetalhadaResposta(
+            id=divisao.id,
+            nome=divisao.nome,
+            descricao=divisao.descricao,
+            exercicios=[
+                converter_exercicio_divisao(item)
+                for item in exercicios
+            ],
+        )
+    except ValueError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(erro),
+        ) from erro
+
+
+@router.put(
+    "/divisoes/{divisao_id}",
+    response_model=DivisaoResposta,
+)
+def atualizar_divisao(
+    divisao_id: int,
+    dados: DivisaoEntrada,
+    service: AcademiaServiceDependencia,
+):
+    try:
+        divisao = service.atualizar_divisao(
+            divisao_id=divisao_id,
+            nome=dados.nome,
+            descricao=dados.descricao,
+        )
+
+        return converter_divisao(divisao)
+    except ValueError as erro:
+        mensagem = str(erro)
+
+        codigo = (
+            status.HTTP_404_NOT_FOUND
+            if mensagem
+            == "Divisão de treino não encontrada."
+            else status.HTTP_400_BAD_REQUEST
+        )
+
+        raise HTTPException(
+            status_code=codigo,
+            detail=mensagem,
+        ) from erro
+
+
+@router.delete(
+    "/divisoes/{divisao_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def excluir_divisao(
+    divisao_id: int,
+    service: AcademiaServiceDependencia,
+):
+    try:
+        service.excluir_divisao(divisao_id)
+    except ValueError as erro:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(erro),
+        ) from erro
+
+
+@router.post(
+    "/divisoes/{divisao_id}/exercicios",
+    response_model=ExercicioDivisaoResposta,
+    status_code=status.HTTP_201_CREATED,
+)
+def adicionar_exercicio_divisao(
+    divisao_id: int,
+    dados: ExercicioDivisaoEntrada,
+    service: AcademiaServiceDependencia,
+):
+    try:
+        associacao = (
+            service.adicionar_exercicio_divisao(
+                divisao_id=divisao_id,
+                exercicio_id=dados.exercicio_id,
+            )
+        )
+
+        return converter_exercicio_divisao(
+            associacao
+        )
+    except ValueError as erro:
+        mensagem = str(erro)
+
+        codigo = (
+            status.HTTP_404_NOT_FOUND
+            if mensagem
+            in {
+                "Divisão de treino não encontrada.",
+                "Exercício não encontrado.",
+            }
+            else status.HTTP_400_BAD_REQUEST
+        )
+
+        raise HTTPException(
+            status_code=codigo,
+            detail=mensagem,
+        ) from erro
+
+
+@router.delete(
+    "/divisoes/{divisao_id}/exercicios/"
+    "{exercicio_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def remover_exercicio_divisao(
+    divisao_id: int,
+    exercicio_id: int,
+    service: AcademiaServiceDependencia,
+):
+    try:
+        service.remover_exercicio_divisao(
+            divisao_id=divisao_id,
+            exercicio_id=exercicio_id,
+        )
+    except ValueError as erro:
+        mensagem = str(erro)
+
+        codigo = (
+            status.HTTP_404_NOT_FOUND
+            if mensagem
+            == "Divisão de treino não encontrada."
+            else status.HTTP_400_BAD_REQUEST
+        )
+
+        raise HTTPException(
+            status_code=codigo,
+            detail=mensagem,
+        ) from erro
 
 @router.post(
     "/exercicios",
